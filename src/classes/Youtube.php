@@ -11,8 +11,6 @@ class Youtube implements VideoService
     
     protected $videoId;
 
-    protected $videoCollection;
-
     private $rawVideoInformation;
 
     /**
@@ -69,20 +67,20 @@ class Youtube implements VideoService
 
     /**
      * Mount the collect that is going to be returned by getVideos eventually
-     * @return void
+     * @return array
      */
-    private function mountVideoCollection(): void
+    private function mountVideoCollection(): array
     {
         preg_match('/"formats":(\[.*?\])/m', $this->rawVideoInformation, $maches);
         
-        $formats = json_decode($maches[1]);
+        $formats = isset($maches[1]) ? json_decode($maches[1]) : [];
 
         if(empty($formats))
         {
-            throw new Exception('The streaming data is invalid.', 500);
+            throw new Exception('Video was not found.', 404);
         }
 
-        $this->videoCollection = $formats;
+        return $formats;
 
     }
 
@@ -92,8 +90,18 @@ class Youtube implements VideoService
      */
     public function getVideos(): array
     {
-        $this->mountVideoCollection();
+        $videos = $this->mountVideoCollection();
+        $collection = [];
 
-        return [];
+        foreach($videos as $video)
+        {
+            array_push($collection, new Video(
+                $video->url,
+                $video->mimeType,
+                $video->qualityLabel
+            ));
+        }
+
+        return $collection;
     }
 }
