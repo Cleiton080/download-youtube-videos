@@ -35,7 +35,7 @@ class YoutubeTest extends TestCase {
         $this->invokeMethod($youtube, 'getVideoId');
     }
 
-    public function testGetACollectionOfVideos(): void
+    public function testShouldGetACollectionOfVideos(): void
     {
         $youtube = new App\Youtube('https://www.youtube.com/watch?v=FLtqAi7WNBY');
 
@@ -43,17 +43,18 @@ class YoutubeTest extends TestCase {
         $videos = $youtube->getVideos();
 
         $this->assertIsArray($videos, 'Get a collection of youtube videos.');
+        $this->assertContainsOnlyInstancesOf('App\Video', $videos);
     }
 
-    public function testGetAEmptyCollectionOfVideos(): void
+    public function testShouldThrowAnExceptionVideoNotFound(): void
     {
-        $youtube = new App\Youtube('https://www.youtube.com/watch?v=FLtqAi7WNBY');
+        $this->expectExceptionCode(404);
+        $this->expectExceptionMessage('Video was not found.');
+
+        $youtube = new App\Youtube('https://www.youtube.com/watch?v=FLtqAi7WNfY');
 
         $youtube->connect();
-        $videos = $youtube->getVideos();
-
-        $this->assertIsArray($videos, 'Get collection.');
-        $this->assertEmpty($videos, 'Get an empty collection of videos.');
+        $youtube->getVideos();
     }
 
     public function invokeMethod(&$object, $methodName, array $parameters = array())
