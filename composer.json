@@ -11,5 +11,15 @@
             "email": "cleitonpessoa53@hotmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php": "^7.4"
+    },
+    "scripts": {
+        "test": "phpunit --color tests/"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    }
 }
